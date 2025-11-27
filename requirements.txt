@@ -1,0 +1,11 @@
+flask-cors
+googletrans==4.0.0-rc1
+rapidfuzz
+flask
+pyngrok
+sentence-transformers
+numpy
+fuzzywuzzy[speedup]
+python-Levenshtein
+requests
+gunicorn 

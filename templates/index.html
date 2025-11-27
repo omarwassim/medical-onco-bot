@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Medical Assistant</title>
+<style>
+body { background:#e5ddd5; font-family:sans-serif; }
+.chat { width:400px; margin:50px auto; background:white; border-radius:10px; height:600px; display:flex; flex-direction:column; overflow:hidden; }
+.header { background:#075e54; color:white; padding:15px; font-size:20px; }
+.body { flex:1; padding:15px; overflow-y:scroll; }
+.msg { padding:10px; margin:8px 0; max-width:80%; border-radius:10px; }
+.user { background:#dcf8c6; margin-left:auto; }
+.bot { background:white; border:1px solid #ccc; }
+.footer { display:flex; padding:10px; background:#f0f0f0; }
+input { flex:1; padding:10px; border-radius:20px; border:1px solid #ccc; }
+button { background:#128c7e; color:white; padding:10px 20px; border-radius:20px; margin-left:10px; cursor:pointer; }
+button.option { margin:5px 5px 0 0; padding:8px 12px; border:none; border-radius:5px; background:#25d366; color:white; }
+button.option:hover { background:#1ebe5d; }
+</style>
+</head>
+<body>
+<div class="chat">
+    <div class="header">المساعد الطبي 🤖</div>
+    <div class="body" id="body"></div>
+    <div class="footer">
+        <input id="msg" placeholder="اكتب رسالتك...">
+        <button onclick="sendMsg()">إرسال</button>
+    </div>
+    <div id="options"></div>
+</div>
+<script>
+function addMsg(sender,text){
+    let b=document.getElementById("body");
+    let d=document.createElement("div");
+    d.className="msg "+sender;
+    d.innerText=text;
+    b.appendChild(d);
+    b.scrollTop=b.scrollHeight;
+}
+async function sendMsg(option=null){
+    let inp=document.getElementById("msg");
+    let t = option || inp.value;
+    if(!t) return;
+    addMsg("user",t);
+    inp.value="";
+    let res=await fetch("/chat",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({message:t})
+    });
+    let data=await res.json();
+    addMsg("bot",data.reply);
+    // حذف الخيارات القديمة
+    document.getElementById("options").innerHTML="";
+    // لو في خيارات، عرضها كأزرار
+    if(data.options){
+        data.options.forEach(opt=>{
+            let btn=document.createElement("button");
+            btn.className="option";
+            btn.innerText=opt;
+            btn.onclick=()=>sendMsg(opt);
+            document.getElementById("options").appendChild(btn);
+        });
+    }
+    if(data.summary){
+        addMsg("bot",JSON.stringify(data.summary,null,2));
+    }
+}
+</script>
+</body>
+</html>
