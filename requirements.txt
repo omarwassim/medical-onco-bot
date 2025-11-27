@@ -9,3 +9,4 @@ fuzzywuzzy[speedup]
 python-Levenshtein
 requests
 gunicorn 
+httpx>=0.27.0
